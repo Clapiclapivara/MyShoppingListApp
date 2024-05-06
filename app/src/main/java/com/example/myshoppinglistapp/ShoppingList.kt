@@ -64,7 +64,28 @@ fun ShoppingListApp() {
                 .padding(16.dp)
         ) {
             items(sItems) {
-                ShoppingListItem(it, {}, {})
+               item ->
+                if(item.isEditing){
+                    ShoppingListEditor(item =item , onEditComplete ={
+                        editedName,editedQuantity ->
+                        sItems = sItems.map{it.copy(isEditing = false)} //the new SItems will be the old sItms mapped. Its false cause were done editing.
+                    var editedItem = sItems.find{it.id ==item.id}
+                        editedItem?.let {
+                            it.name = editedName
+                            it.quantity = editedQuantity
+                        }
+                    })
+                    }else{
+                    ShoppingListItem(item = item,
+                        onEditClick = {
+                        //im finding out which item is being edited when we click the button and changing its "isEditing boolean" to true
+                        sItems = sItems.map{it.copy(isEditing = it.id == item.id)}
+                    },
+                        onDeleteClick = {
+                            sItems =sItems-item
+
+                    })
+                }
             }
         }
     }
@@ -188,7 +209,8 @@ fun ShoppingListItem(
             .border(
                 border = BorderStroke(2.dp, Color.Cyan),
                 shape = RoundedCornerShape(20)
-            )
+            ),
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(text = item.name, modifier = Modifier.padding(8.dp))
         Text(text = "Qty: ${item.quantity}", modifier = Modifier.padding(8.dp))
